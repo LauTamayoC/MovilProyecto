@@ -12,7 +12,7 @@ app.set('port', process.env.PORT || 3000);
 app.use(express.json());
 app.use(
   cors({
-    origin: 'http://localhost:8081',
+    origin: 'http://localhost:8082',
   })
 );
 app.use(morgan('dev'));
