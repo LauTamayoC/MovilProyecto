@@ -1,13 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import logo from '../../assets/logo.png'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import logo from '../../assets/logo.png';
 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      {/* <View style={{textAlign:'center', justifyContent:'center'}}>
-      <Image source={logo} style={{width:300, height:200}}/>
-      </View> */}
+      {/* Contenedor para centrar la imagen */}
+      <View style={styles.logoContainer}>
+        <Image source={logo} style={styles.logo} />
+      </View>
+      
       <Text style={styles.welcomeText}>Bienvenido a la Plataforma Banca Estebanquito</Text>
       
       <View>
@@ -64,7 +66,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f0f0f5',  
+    backgroundColor: '#f0f0f5',
+  },
+  logoContainer: {
+    alignItems: 'center', // Centra horizontalmente
+    justifyContent: 'center', // Centra verticalmente dentro del contenedor principal
+    marginBottom: 20, // Espacio debajo de la imagen
+  },
+  logo: {
+    width: 150,
+    height: 100,
+    resizeMode: 'contain', // Ajusta la imagen para que no se recorte
   },
   welcomeText: {
     fontSize: 22,
@@ -97,6 +109,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4A0072', 
     marginBottom: 5,
+    textAlign: 'center', // Centra el texto horizontalmente
   },
   accountNumber: {
     fontSize: 16,

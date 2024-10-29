@@ -7,7 +7,7 @@ const router = Router();
 router.post(
   '/login',
   cors({
-    origin: 'http://localhost:8082',
+    origin: 'http://localhost:8081',
   }),
   metodosTransaccion.loginUsuario
 );
@@ -15,7 +15,7 @@ router.post(
 router.post(
   '/registrar',
   cors({
-    origin: 'http://localhost:8082',
+    origin: 'http://localhost:8081',
   }),
   metodosTransaccion.postRegistrar
 );
@@ -23,7 +23,7 @@ router.post(
 router.get(
   '/  ',
   cors({
-    origin: 'http://localhost:8082',
+    origin: 'http://localhost:8081',
   }),
   metodosTransaccion.getTransacciones
 );
@@ -31,7 +31,7 @@ router.get(
 router.get(
   '/usuarios',
   cors({
-    origin: 'http://localhost:8082',
+    origin: 'http://localhost:8081',
   }),
   metodosTransaccion.getUsuarios
 );
@@ -39,7 +39,7 @@ router.get(
 router.get(
   '/prestamos',
   cors({
-    origin: 'http://localhost:8082',
+    origin: 'http://localhost:8081',
   }),
   metodosTransaccion.getPrestamos
 );
@@ -47,7 +47,7 @@ router.get(
 router.get(
   '/reportes',
   cors({
-    origin: 'http://localhost:8082',
+    origin: 'http://localhost:8081',
   }),
   metodosTransaccion.getReportes
 );

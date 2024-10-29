@@ -29,9 +29,12 @@ function AuthStack() {
   );
 }
 
-function MainTabs({ navigation }) {
+function MainTabs({ route }) {
+  const initialRoute = route.params?.screen || 'Inicio'; // Usa el parámetro screen o 'Inicio' por defecto
+
   return (
-    <Tab.Navigator 
+    <Tab.Navigator
+      initialRouteName={initialRoute} // Configura la pantalla inicial con el parámetro recibido
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
@@ -49,11 +52,7 @@ function MainTabs({ navigation }) {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen 
-        name="Inicio" 
-        component={HomeScreen}
-        initialParams={{ drawerNavigation: navigation }}
-      />
+      <Tab.Screen name="Inicio" component={HomeScreen} />
       <Tab.Screen name="Cuenta" component={AccountScreen} />
       <Tab.Screen name="Transacciones" component={TransactionScreen} />
       <Tab.Screen name="Prestamos" component={LoanScreen} />
@@ -92,12 +91,36 @@ function DrawerNavigator() {
         },
       })}
     >
-      <Drawer.Screen name="Inicio" component={MainTabs} />
-      <Drawer.Screen name="Perfil" component={ProfileScreen} />
-      <Drawer.Screen name="Cuenta" component={AccountScreen} />
-      <Drawer.Screen name="Prestamos" component={LoanScreen} />
-      <Drawer.Screen name="Reportes" component={ReportScreen} />
-      <Drawer.Screen name="Transacciones" component={TransactionScreen} />
+      <Drawer.Screen 
+        name="Inicio" 
+        component={MainTabs} 
+        initialParams={{ screen: 'Inicio' }}
+      />
+      <Drawer.Screen 
+        name="Perfil" 
+        component={MainTabs} 
+        initialParams={{ screen: 'Cuenta' }}
+      />
+      <Drawer.Screen 
+        name="Cuenta" 
+        component={MainTabs} 
+        initialParams={{ screen: 'Cuenta' }}
+      />
+      <Drawer.Screen 
+        name="Prestamos" 
+        component={MainTabs} 
+        initialParams={{ screen: 'Prestamos' }}
+      />
+      <Drawer.Screen 
+        name="Reportes" 
+        component={MainTabs} 
+        initialParams={{ screen: 'Transacciones' }}
+      />
+      <Drawer.Screen 
+        name="Transacciones" 
+        component={MainTabs} 
+        initialParams={{ screen: 'Transacciones' }}
+      />
     </Drawer.Navigator>
   );
 }
