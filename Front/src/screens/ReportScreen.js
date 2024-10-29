@@ -1,16 +1,25 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ReportScreen() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
-      <View style = {styles.containerTitle}>
-      <Text style = {styles.acTitle}>Reportes Financieros</Text>
+      <View style={styles.containerTitle}>
+        <Text style={styles.acTitle}>Reportes Financieros</Text>
       </View>
-      <TouchableOpacity style = {styles.button} onPress={() => {}}>
-        <Text style={styles.buttonText}>
-        Generar Reporte
-        </Text>
+      
+      <TouchableOpacity style={styles.button} onPress={() => {}}>
+        <Text style={styles.buttonText}>Generar Reporte</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.button, styles.homeButton]}
+        onPress={() => navigation.navigate('Inicio')}
+      >
+        <Text style={styles.buttonText}>Volver al Inicio</Text>
       </TouchableOpacity>
     </View>
   );

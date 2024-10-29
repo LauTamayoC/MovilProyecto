@@ -1,32 +1,39 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ProfileScreen() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
-    
       <View style={styles.containerTitle}>     
-        <Text style= {styles.accountTitleP}>Perfil del Usuario</Text>
+        <Text style={styles.accountTitleP}>Perfil del Usuario</Text>
       </View>
 
-      <View style = {styles.infoContainer}>
-      <Text>Nombre</Text>
-      <Text>Apellidos</Text>
-      <Text>Telefono</Text>
-      <Text>Email</Text>
+      <View style={styles.infoContainer}>
+        <Text>Nombre</Text>
+        <Text>Apellidos</Text>
+        <Text>Telefono</Text>
+        <Text>Email</Text>
       </View>
 
       <TouchableOpacity 
-      onPress={() => {}}
-      style={styles.button}>
-        <Text style={styles.buttonText}>
-          Editar perfil
-        </Text>
+        onPress={() => {}}
+        style={styles.button}
+      >
+        <Text style={styles.buttonText}>Editar perfil</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.button, styles.homeButton]}
+        onPress={() => navigation.navigate('Inicio')}
+      >
+        <Text style={styles.buttonText}>Volver al Inicio</Text>
       </TouchableOpacity>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 

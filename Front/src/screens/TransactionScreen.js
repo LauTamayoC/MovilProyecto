@@ -1,30 +1,39 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function TransactionScreen() {
+  const navigation = useNavigation();
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('');
 
   return (
     <View style={styles.container}>
-      <TextInput placeholder="Monto"
-      value={amount} 
-      secureTextEntry
-      onChangeText={setAmount} 
-      style={styles.input}
-      placeholderTextColor="#b19cd9" />
+      <TextInput 
+        placeholder="Monto"
+        value={amount} 
+        onChangeText={setAmount} 
+        style={styles.input}
+        placeholderTextColor="#b19cd9"
+      />
 
-      <TextInput placeholder="Tipo (Transferencia/Depósito/Retiro)" 
-      value={type} 
-      secureTextEntry
-      onChangeText={setType}
-      style={styles.input}     
-      placeholderTextColor="#b19cd9" />
+      <TextInput 
+        placeholder="Tipo (Transferencia/Depósito/Retiro)" 
+        value={type} 
+        onChangeText={setType}
+        style={styles.input}     
+        placeholderTextColor="#b19cd9"
+      />
 
       <TouchableOpacity style={styles.button} onPress={() => {}}>
-        <Text style = {styles.buttonText}>
-          Continuar
-        </Text>
+        <Text style={styles.buttonText}>Continuar</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.button, styles.homeButton]}
+        onPress={() => navigation.navigate('Inicio')}
+      >
+        <Text style={styles.buttonText}>Volver al Inicio</Text>
       </TouchableOpacity>
     </View>
   );

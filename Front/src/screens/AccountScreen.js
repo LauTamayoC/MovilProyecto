@@ -19,6 +19,13 @@ export default function AccountScreen() {
         >
           <Text style={styles.buttonText}>Ver Historial de Transacciones</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.homeButton]}
+          onPress={() => navigation.navigate('Inicio')}
+        >
+          <Text style={styles.buttonText}>Volver al Inicio</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
