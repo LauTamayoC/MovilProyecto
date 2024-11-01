@@ -23,9 +23,6 @@ const loginUsuario = async (req, res) => {
       return res.status(401).json({ message: 'Email o contraseña incorrectos' });
     }
 
-    console.log('Contraseña ingresada:', contrasena);
-    console.log('Contraseña en DB:', user.contrasena);
-
     const isMatch = await bcrypt.compare(contrasena, user.contrasena);
 
     if (!isMatch) {
@@ -101,6 +98,28 @@ const getReportes = async (req, res) => {
   }
 };
 
+
+const getCuenta = async (req, res) => {
+  try {
+    const connection = await getConnection();
+    const { numero_cuenta } = req.params;
+    
+    const result = await connection.query(
+      'SELECT * FROM usuarios WHERE numero_cuenta = ?',
+      [numero_cuenta]
+    );
+    
+    if (result[0].length === 0) {
+      return res.status(404).json({ message: 'Cuenta no encontrada' });
+    }
+    
+    res.json(result[0][0]);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+
 export const metodosTransaccion = {
   postRegistrar,
   loginUsuario,
@@ -108,5 +127,6 @@ export const metodosTransaccion = {
   getUsuarios,
   getPrestamos,
   getReportes,
+  getCuenta, 
   corsMiddleware,
 };

@@ -21,7 +21,7 @@ router.post(
 );
 
 router.get(
-  '/  ',
+  '/transacciones',
   cors({
     origin: 'http://localhost:8081',
   }),
@@ -50,6 +50,15 @@ router.get(
     origin: 'http://localhost:8081',
   }),
   metodosTransaccion.getReportes
+);
+
+
+router.get(
+  '/cuentas/:numero_cuenta',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.getCuenta
 );
 
 export default router;
