@@ -82,9 +82,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f5',
   },
   logo: {
-    width: 200,   
-    height: 200,
+    width: 300,   
+    height: 400,
     alignSelf: 'center',
+    resizeMode: 'contain',
     marginBottom: 30, 
   },
   title: {

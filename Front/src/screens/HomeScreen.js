@@ -74,10 +74,13 @@ const styles = StyleSheet.create({
     marginBottom: 20, // Espacio debajo de la imagen
   },
   logo: {
-    width: 150,
-    height: 100,
-    resizeMode: 'contain', // Ajusta la imagen para que no se recorte
+    width: 300,   
+    height: 400,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginBottom: 30, 
   },
+  
   welcomeText: {
     fontSize: 22,
     fontWeight: 'bold',

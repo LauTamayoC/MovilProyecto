@@ -77,9 +77,7 @@ router.get(
   metodosTransaccion.getCuenta
 );
 
-<<<<<<< HEAD
-export default router;
-=======
+
 router.put(
   '/editarUsuario/:userId',
   cors({
@@ -88,5 +86,6 @@ router.put(
   metodosTransaccion.editarPerfilUsuario
 );
 
+
+
 export default router;
->>>>>>> b9be363ae6d25d15511fc1db05948496d3de444f

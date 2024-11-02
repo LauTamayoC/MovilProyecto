@@ -40,7 +40,7 @@ const loginUsuario = async (req, res) => {
   }
 };
 
-// Registro de usuario
+
 const postRegistrar = async (req, res) => {
   try {
     const connection = await getConnection();
@@ -84,10 +84,7 @@ const getTransaccionesHistory = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-// Obtener usuarios
-=======
->>>>>>> b9be363ae6d25d15511fc1db05948496d3de444f
+
 const getUsuarios = async (req, res) => {
   try {
     const connection = await getConnection();
@@ -184,6 +181,7 @@ const editarPerfilUsuario = async (req, res) => {
   }
 };
 
+
 export const metodosTransaccion = {
   postRegistrar,
   loginUsuario,
@@ -194,9 +192,7 @@ export const metodosTransaccion = {
   getCuenta,
   corsMiddleware,
   getTransaccionesHistory,
-<<<<<<< HEAD
   postPrestamo, 
-=======
   editarPerfilUsuario,
->>>>>>> b9be363ae6d25d15511fc1db05948496d3de444f
+  
 };
