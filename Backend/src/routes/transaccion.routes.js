@@ -60,13 +60,20 @@ router.get(
   metodosTransaccion.getReportes
 );
 
-
 router.get(
   '/cuentas/:numero_cuenta',
   cors({
     origin: 'http://localhost:8081',
   }),
   metodosTransaccion.getCuenta
+);
+
+router.put(
+  '/editarUsuario/:userId',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.editarPerfilUsuario
 );
 
 export default router;
