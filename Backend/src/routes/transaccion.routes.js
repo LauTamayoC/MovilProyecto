@@ -44,6 +44,14 @@ router.get(
   metodosTransaccion.getUsuarios
 );
 
+router.post(
+  '/prestamos',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.postPrestamo
+);
+
 router.get(
   '/prestamos',
   cors({
@@ -61,7 +69,7 @@ router.get(
 );
 
 router.get(
-  '/cuentas/:numero_cuenta',
+  '/cuenta/:numero_cuenta',
   cors({
     origin: 'http://localhost:8081',
   }),

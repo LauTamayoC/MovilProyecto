@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { getConnection } from '../database/database.js';
 
+// Middleware para CORS
 const corsMiddleware = (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -11,6 +12,7 @@ const corsMiddleware = (req, res, next) => {
   next();
 };
 
+// Login de usuario
 const loginUsuario = async (req, res) => {
   try {
     const connection = await getConnection();
@@ -39,9 +41,8 @@ const loginUsuario = async (req, res) => {
 const postRegistrar = async (req, res) => {
   try {
     const connection = await getConnection();
-    const { name, email, password, accountNumber, accountType } = req.body;
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const { name, email, hashedPassword, accountNumber, accountType } = req.body;
+
     const result = await connection.query(
       'INSERT INTO usuarios (nombre, email, contrasena, numero_cuenta, tipo_cuenta) VALUES (?, ?, ?, ?, ?)',
       [name, email, hashedPassword, accountNumber, accountType]
@@ -54,17 +55,18 @@ const postRegistrar = async (req, res) => {
   }
 };
 
+// Obtener transacciones
 const getTransacciones = async (req, res) => {
   try {
     const connection = await getConnection();
     const result = await connection.query('SELECT * FROM transacciones');
     res.json(result[0]);
   } catch (error) {
-    res.status(500);
-    res.send(error.message);
+    res.status(500).send(error.message);
   }
 };
 
+// Historial de transacciones
 const getTransaccionesHistory = async (req, res) => {
   try {
     const connection = await getConnection();
@@ -85,8 +87,7 @@ const getUsuarios = async (req, res) => {
     const result = await connection.query('SELECT * FROM usuarios');
     res.json(result[0]);
   } catch (error) {
-    res.status(500);
-    res.send(error.message);
+    res.status(500).send(error.message);
   }
 };
 
@@ -96,8 +97,24 @@ const getPrestamos = async (req, res) => {
     const result = await connection.query('SELECT * FROM prestamos');
     res.json(result[0]);
   } catch (error) {
-    res.status(500);
-    res.send(error.message);
+    res.status(500).send(error.message);
+  }
+};
+
+const postPrestamo = async (req, res) => {
+  try {
+    const connection = await getConnection();
+    const { monto, plazo } = req.body;
+
+    if (!monto || !plazo) {
+      return res.status(400).json({ message: 'Monto y plazo son requeridos' });
+    }
+
+    const result = await connection.query('INSERT INTO prestamos (monto, plazo) VALUES (?, ?)', [monto, plazo]);
+
+    res.json({ message: 'Préstamo solicitado exitosamente', prestamoId: result.insertId });
+  } catch (error) {
+    res.status(500).send(error.message);
   }
 };
 
@@ -107,8 +124,7 @@ const getReportes = async (req, res) => {
     const result = await connection.query('SELECT * FROM reportes');
     res.json(result[0]);
   } catch (error) {
-    res.status(500);
-    res.send(error.message);
+    res.status(500).send(error.message);
   }
 };
 
@@ -189,6 +205,7 @@ export const metodosTransaccion = {
   getCuenta,
   corsMiddleware,
   getTransaccionesHistory,
+  postPrestamo,
   editarPerfilUsuario,
   getPerfilUsuario,
 };
