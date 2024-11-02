@@ -1,14 +1,6 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
-const dummyTransactions = [
-  { id: '1', date: '2024-10-01', type: 'Depósito', amount: 500 },
-  { id: '2', date: '2024-10-03', type: 'Retiro', amount: -200 },
-  { id: '3', date: '2024-10-05', type: 'Transferencia', amount: -150 },
-  { id: '4', date: '2024-10-07', type: 'Depósito', amount: 1000 },
-  { id: '5', date: '2024-10-09', type: 'Retiro', amount: -50 },
-];
 
 const TransactionItem = ({ item }) => (
   <View style={styles.transactionItem}>
@@ -19,16 +11,39 @@ const TransactionItem = ({ item }) => (
     </Text>
   </View>
 );
+
 export default function TransactionHistoryScreen() {
   const navigation = useNavigation();
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/transaccioneshistory');
+
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTransactions();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#8A05BE" style={{ flex: 1, justifyContent: 'center' }} />;
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Historial de Transacciones</Text>
       <FlatList
-        data={dummyTransactions}
+        data={transactions}
         renderItem={({ item }) => <TransactionItem item={item} />}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()}
       />
       <TouchableOpacity
         style={[styles.button, styles.homeButton]}
