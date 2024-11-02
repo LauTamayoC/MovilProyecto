@@ -76,4 +76,12 @@ router.put(
   metodosTransaccion.editarPerfilUsuario
 );
 
+router.get(
+  '/perfilUsuario/:userId',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.getPerfilUsuario
+);
+
 export default router;

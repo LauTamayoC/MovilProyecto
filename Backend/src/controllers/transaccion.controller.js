@@ -135,7 +135,7 @@ const editarPerfilUsuario = async (req, res) => {
     const { userId } = req.params;
     const { name, email, accountType } = req.body;
 
-    const result = await connection.query('UPDATE usuarios SET nombre = ?, email = ?, tipo_cuenta = ?, WHERE id = ?', [
+    const result = await connection.query('UPDATE usuarios SET nombre = ?, email = ?, tipo_cuenta = ? WHERE id = ?', [
       name,
       email,
       accountType,
@@ -153,6 +153,32 @@ const editarPerfilUsuario = async (req, res) => {
   }
 };
 
+const getPerfilUsuario = async (req, res) => {
+  try {
+    const connection = await getConnection();
+    const { userId } = req.params;
+
+    const result = await connection.query('SELECT * FROM usuarios WHERE id = ?', [userId]);
+    const user = result[0][0];
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({
+      id: user.id,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      email: user.email,
+      numero_cuenta: user.numero_cuenta,
+      tipo_cuenta: user.tipo_cuenta,
+    });
+  } catch (error) {
+    console.error('Error al obtener el perfil del usuario:', error);
+    res.status(500).send(error.message);
+  }
+};
+
 export const metodosTransaccion = {
   postRegistrar,
   loginUsuario,
@@ -164,4 +190,5 @@ export const metodosTransaccion = {
   corsMiddleware,
   getTransaccionesHistory,
   editarPerfilUsuario,
+  getPerfilUsuario,
 };
