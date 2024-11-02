@@ -84,7 +84,10 @@ const getTransaccionesHistory = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 // Obtener usuarios
+=======
+>>>>>>> b9be363ae6d25d15511fc1db05948496d3de444f
 const getUsuarios = async (req, res) => {
   try {
     const connection = await getConnection();
@@ -140,27 +143,46 @@ const getReportes = async (req, res) => {
   }
 };
 
-
 const getCuenta = async (req, res) => {
   try {
     const connection = await getConnection();
     const { numero_cuenta } = req.params;
-    
-    const result = await connection.query(
-      'SELECT * FROM usuarios WHERE numero_cuenta = ?',
-      [numero_cuenta]
-    );
-    
+
+    const result = await connection.query('SELECT * FROM usuarios WHERE numero_cuenta = ?', [numero_cuenta]);
+
     if (result[0].length === 0) {
       return res.status(404).json({ message: 'Cuenta no encontrada' });
     }
-    
+
     res.json(result[0][0]);
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
 
+const editarPerfilUsuario = async (req, res) => {
+  try {
+    const connection = await getConnection();
+    const { userId } = req.params;
+    const { name, email, accountType } = req.body;
+
+    const result = await connection.query('UPDATE usuarios SET nombre = ?, email = ?, tipo_cuenta = ?, WHERE id = ?', [
+      name,
+      email,
+      accountType,
+      userId,
+    ]);
+
+    if (result[0].affectedRows === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({ message: 'Perfil actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error al editar el perfil del usuario:', error);
+    res.status(500).send(error.message);
+  }
+};
 
 export const metodosTransaccion = {
   postRegistrar,
@@ -169,8 +191,12 @@ export const metodosTransaccion = {
   getUsuarios,
   getPrestamos,
   getReportes,
-  getCuenta, 
+  getCuenta,
   corsMiddleware,
   getTransaccionesHistory,
+<<<<<<< HEAD
   postPrestamo, 
+=======
+  editarPerfilUsuario,
+>>>>>>> b9be363ae6d25d15511fc1db05948496d3de444f
 };
