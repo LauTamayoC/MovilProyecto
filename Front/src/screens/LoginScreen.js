@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
- 
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
+
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
- 
+
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Todos los campos son obligatorios');
@@ -26,14 +26,14 @@ export default function LoginScreen({ navigation }) {
           contrasena: password,
         }),
       });
- 
+
       const data = await response.json();
- 
+
       if (!response.ok) {
         Alert.alert('Error', data.message || 'Error en la solicitud');
         return;
       }
- 
+
       console.log('Usuario autenticado:', data);
       Alert.alert('Éxito', 'Inicio de sesión exitoso');
       navigation.replace('Main');
@@ -42,9 +42,12 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Error', 'No se pudo iniciar sesión. Verifica tu conexión.');
     }
   };
- 
+
   return (
     <View style={styles.container}>
+      {/* Logo */}
+      <Image source={require('../../assets/logo.png')} style={styles.logo} />
+      
       <Text style={styles.title}>Iniciar Sesión</Text>
       <TextInput
         placeholder='Email'
@@ -70,13 +73,19 @@ export default function LoginScreen({ navigation }) {
     </View>
   );
 }
- 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 20,
     backgroundColor: '#f0f0f5',
+  },
+  logo: {
+    width: 200,   
+    height: 200,
+    alignSelf: 'center',
+    marginBottom: 30, 
   },
   title: {
     fontSize: 24,
