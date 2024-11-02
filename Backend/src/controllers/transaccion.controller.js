@@ -12,7 +12,7 @@ const corsMiddleware = (req, res, next) => {
   next();
 };
 
-// Login de usuario
+// Login de Usuario
 const loginUsuario = async (req, res) => {
   try {
     const connection = await getConnection();
@@ -37,12 +37,13 @@ const loginUsuario = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
-
+//Registrar Usuario
 const postRegistrar = async (req, res) => {
   try {
     const connection = await getConnection();
-    const { name, email, hashedPassword, accountNumber, accountType } = req.body;
-
+    const { name, email, password, accountNumber, accountType } = req.body;
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
     const result = await connection.query(
       'INSERT INTO usuarios (nombre, email, contrasena, numero_cuenta, tipo_cuenta) VALUES (?, ?, ?, ?, ?)',
       [name, email, hashedPassword, accountNumber, accountType]
