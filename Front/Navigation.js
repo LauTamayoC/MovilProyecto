@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { MaterialCommunityIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 
-// Importación de pantallas
+
 import HomeScreen from './src/screens/HomeScreen';
 import RegisterScreen from './src/screens/ResgisterScreen';
 import LoginScreen from './src/screens/LoginScreen';
@@ -98,8 +98,8 @@ function DrawerNavigator() {
       />
       <Drawer.Screen 
         name="Perfil" 
-        component={MainTabs} 
-        initialParams={{ screen: 'Cuenta' }}
+        component={ProfileScreen} 
+        initialParams={{ screen: 'Perfil' }}
       />
       <Drawer.Screen 
         name="Cuenta" 
@@ -113,8 +113,8 @@ function DrawerNavigator() {
       />
       <Drawer.Screen 
         name="Reportes" 
-        component={MainTabs} 
-        initialParams={{ screen: 'Transacciones' }}
+        component={ReportScreen} 
+        initialParams={{ screen: 'Reportes' }}
       />
       <Drawer.Screen 
         name="Transacciones" 

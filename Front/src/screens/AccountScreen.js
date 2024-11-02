@@ -1,16 +1,39 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function AccountScreen() {
   const navigation = useNavigation();
+  const [accountInfo, setAccountInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAccountInfo = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/cuenta/numero_cuenta');
+        const data = await response.json();
+        setAccountInfo(data);
+      } catch (error) {
+        console.error('Error fetching account info:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAccountInfo();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#8A05BE" style={{ flex: 1, justifyContent: 'center' }} />;
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.accountTitle}>Información de la Cuenta</Text>
       <View style={styles.accountInfoContainer}>
         <Text style={styles.accountInfoText}>Saldo Actual:</Text>
-        <Text style={styles.accountInfoBalance}>$400,000.00</Text>
+        <Text style={styles.accountInfoBalance}>
+          {accountInfo && typeof accountInfo.saldo === 'number' ? `$${accountInfo.saldo.toFixed(2)}` : 'Saldo no disponible'}
+        </Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity

@@ -5,7 +5,7 @@ import logo from '../../assets/logo.png';
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      {/* Contenedor para centrar la imagen */}
+      
       <View style={styles.logoContainer}>
         <Image source={logo} style={styles.logo} />
       </View>
