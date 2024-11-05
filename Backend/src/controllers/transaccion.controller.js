@@ -146,7 +146,7 @@ const getCuenta = async (req, res) => {
   }
 };
 
-const editarPerfilUsuario = async (req, res) => {
+const putPerfilUsuario = async (req, res) => {
   try {
     const connection = await getConnection();
     const { userId } = req.params;
@@ -166,7 +166,7 @@ const editarPerfilUsuario = async (req, res) => {
     res.json({ message: 'Perfil actualizado exitosamente' });
   } catch (error) {
     console.error('Error al editar el perfil del usuario:', error);
-    res.status(500).send(error.message);
+    res.status(500).json({ message: 'Error al editar el perfil del usuario', error: error.message });
   }
 };
 
@@ -204,9 +204,9 @@ export const metodosTransaccion = {
   getPrestamos,
   getReportes,
   getCuenta,
-  corsMiddleware,
   getTransaccionesHistory,
   postPrestamo,
-  editarPerfilUsuario,
+  putPerfilUsuario,
   getPerfilUsuario,
+  corsMiddleware,
 };

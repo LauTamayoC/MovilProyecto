@@ -1,44 +1,71 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useUser } from '../../userContext.js';
 
 export default function EditProfileScreen({ route, navigation }) {
-  const { userId } = route.params; 
+  const { user } = useUser();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [accountType, setAccountType] = useState('');
 
-  
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchEditProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:8081/getUsuario/${userId}`);
-        const { nombre, email, tipo_cuenta } = response.data;
+        const response = await fetch(`http://localhost:8081/editarUsuario/${user.id}`);
+        if (!response.ok) {
+          throw new Error('Error en la solicitud');
+        }
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new TypeError('La respuesta no es JSON');
+        }
+        const data = await response.json();
+        const { nombre, email, tipo_cuenta } = data;
         setName(nombre);
         setEmail(email);
         setAccountType(tipo_cuenta);
       } catch (error) {
-        console.error("Error al cargar los datos del usuario:", error);
+        console.error('Error al cargar los datos del usuario:', error);
+        Alert.alert('Error', 'No se pudo cargar los datos del usuario');
       }
     };
-    fetchUserData();
-  }, [userId]);
 
-  
+    if (user) {
+      fetchEditProfile();
+    }
+  }, [user]);
+
   const handleSave = async () => {
+    if (!name || !email || !accountType) {
+      Alert.alert('Error', 'Todos los campos son obligatorios');
+      return;
+    }
+
     try {
-      const response = await axios.put(`http://localhost:8081/editarUsuario/${userId}`, {
-        name,
-        email,
-        accountType,
+      const response = await fetch(`http://localhost:8081/editarUsuario/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: name,
+          email: email,
+          tipo_cuenta: accountType,
+        }),
       });
 
-      if (response.data.message) {
-        Alert.alert('Éxito', response.data.message);
+      if (!response.ok) {
+        throw new Error('Error en la actualización');
+      }
+
+      const data = await response.json();
+
+      if (data.message) {
+        Alert.alert('Éxito', data.message);
         navigation.goBack();
       }
     } catch (error) {
-      console.error("Error al actualizar el perfil:", error);
+      console.error('Error al actualizar el perfil:', error);
       Alert.alert('Error', 'No se pudo actualizar el perfil');
     }
   };
@@ -47,25 +74,15 @@ export default function EditProfileScreen({ route, navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Editar Perfil</Text>
 
+      <TextInput style={styles.input} placeholder='Nombre' value={name} onChangeText={setName} />
       <TextInput
         style={styles.input}
-        placeholder="Nombre"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
+        placeholder='Email'
         value={email}
         onChangeText={setEmail}
-        keyboardType="email-address"
+        keyboardType='email-address'
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Tipo de cuenta"
-        value={accountType}
-        onChangeText={setAccountType}
-      />
+      <TextInput style={styles.input} placeholder='Tipo de cuenta' value={accountType} onChangeText={setAccountType} />
 
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Guardar cambios</Text>

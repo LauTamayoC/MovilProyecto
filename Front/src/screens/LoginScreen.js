@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useUser } from '../../userContext.js';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { setUser } = useUser();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -28,6 +30,7 @@ export default function LoginScreen({ navigation }) {
       });
 
       const data = await response.json();
+      setUser({ id: data.userId });
 
       if (!response.ok) {
         Alert.alert('Error', data.message || 'Error en la solicitud');
@@ -47,7 +50,7 @@ export default function LoginScreen({ navigation }) {
     <View style={styles.container}>
       {/* Logo */}
       <Image source={require('../../assets/logo.png')} style={styles.logo} />
-      
+
       <Text style={styles.title}>Iniciar Sesión</Text>
       <TextInput
         placeholder='Email'
@@ -82,11 +85,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f5',
   },
   logo: {
-    width: 300,   
+    width: 300,
     height: 400,
     alignSelf: 'center',
     resizeMode: 'contain',
-    marginBottom: 30, 
+    marginBottom: 30,
   },
   title: {
     fontSize: 24,

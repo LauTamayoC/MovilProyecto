@@ -81,7 +81,7 @@ router.put(
   cors({
     origin: 'http://localhost:8081',
   }),
-  metodosTransaccion.editarPerfilUsuario
+  metodosTransaccion.putPerfilUsuario
 );
 
 router.get(
