@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const TransactionItem = ({ item }) => (
   <View style={styles.transactionItem}>
@@ -34,7 +34,7 @@ export default function TransactionHistoryScreen() {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#8A05BE" style={{ flex: 1, justifyContent: 'center' }} />;
+    return <ActivityIndicator size='large' color='#8A05BE' style={{ flex: 1, justifyContent: 'center' }} />;
   }
 
   return (
@@ -43,13 +43,10 @@ export default function TransactionHistoryScreen() {
       <FlatList
         data={transactions}
         renderItem={({ item }) => <TransactionItem item={item} />}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
       />
-      <TouchableOpacity
-        style={[styles.button, styles.homeButton]}
-        onPress={() => navigation.navigate('Cuenta')}
-      >
-        <Text style={styles.buttonText}>Volver a tus cuentas</Text>
+      <TouchableOpacity style={[styles.button, styles.homeButton]} onPress={() => navigation.navigate('Cuenta')}>
+        <Text style={styles.buttonText}>Volver a tus usuarios</Text>
       </TouchableOpacity>
     </View>
   );

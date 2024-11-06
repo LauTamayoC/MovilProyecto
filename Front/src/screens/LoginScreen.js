@@ -48,7 +48,6 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Image source={require('../../assets/logo.png')} style={styles.logo} />
 
       <Text style={styles.title}>Iniciar Sesión</Text>

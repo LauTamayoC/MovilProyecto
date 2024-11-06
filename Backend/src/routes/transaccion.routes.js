@@ -36,6 +36,14 @@ router.get(
   metodosTransaccion.getTransaccionesHistory
 );
 
+router.post(
+  '/transaccion',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.postTransaccion
+);
+
 router.get(
   '/usuarios',
   cors({

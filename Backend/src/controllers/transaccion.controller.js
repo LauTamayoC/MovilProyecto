@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { getConnection } from '../database/database.js';
+import { getConnection, pool } from '../database/database.js';
 
 // Middleware para CORS
 const corsMiddleware = (req, res, next) => {
@@ -150,12 +150,12 @@ const putPerfilUsuario = async (req, res) => {
   try {
     const connection = await getConnection();
     const { userId } = req.params;
-    const { name, email, accountType } = req.body;
+    const { nombre, email, tipo_cuenta } = req.body;
 
     const result = await connection.query('UPDATE usuarios SET nombre = ?, email = ?, tipo_cuenta = ? WHERE id = ?', [
-      name,
+      nombre,
       email,
-      accountType,
+      tipo_cuenta,
       userId,
     ]);
 
@@ -196,6 +196,91 @@ const getPerfilUsuario = async (req, res) => {
   }
 };
 
+const postTransaccion = async (req, res) => {
+  let connection;
+  try {
+    if (!req.user || !req.user.numero_cuenta) {
+      return res.status(401).json({ message: 'Usuario no autenticado' });
+    }
+
+    connection = await pool.getConnection();
+    const { tipo, monto, numero_cuenta_destino } = req.body;
+    const numero_cuenta_origen = req.user.numero_cuenta;
+
+    if (
+      !tipo ||
+      !monto ||
+      !numero_cuenta_origen ||
+      (tipo.toLowerCase() === 'transferencia' && !numero_cuenta_destino)
+    ) {
+      return res.status(400).json({ message: 'Tipo, monto y número de cuenta son requeridos' });
+    }
+
+    if (isNaN(monto) || monto <= 0) {
+      return res.status(400).json({ message: 'El monto debe ser un número positivo' });
+    }
+
+    const [cuentaOrigen] = await connection.query('SELECT numero_cuenta, saldo FROM usuarios WHERE numero_cuenta = ?', [
+      numero_cuenta_origen,
+    ]);
+    if (!cuentaOrigen.length) {
+      return res.status(404).json({ message: 'Cuenta de origen no encontrada' });
+    }
+
+    const saldoOrigen = cuentaOrigen[0].saldo;
+
+    const tiposValidos = ['transferencia', 'retiro', 'deposito'];
+    if (!tiposValidos.includes(tipo.toLowerCase())) {
+      return res.status(400).json({ message: 'Tipo de transacción no válido' });
+    }
+
+    if ((tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'retiro') && saldoOrigen < monto) {
+      return res.status(400).json({ message: 'Saldo insuficiente' });
+    }
+
+    await connection.beginTransaction();
+
+    const result = await connection.query('INSERT INTO transacciones (numero_cuenta, tipo, monto) VALUES (?, ?, ?)', [
+      numero_cuenta_origen,
+      tipo,
+      monto,
+    ]);
+
+    let updateQueryOrigen;
+    if (tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'retiro') {
+      updateQueryOrigen = 'UPDATE usuarios SET saldo = saldo - ? WHERE numero_cuenta = ?';
+    } else if (tipo.toLowerCase() === 'deposito') {
+      updateQueryOrigen = 'UPDATE usuarios SET saldo = saldo + ? WHERE numero_cuenta = ?';
+    }
+
+    await connection.query(updateQueryOrigen, [monto, numero_cuenta_origen]);
+
+    if (tipo.toLowerCase() === 'transferencia') {
+      const [cuentaDestino] = await connection.query(
+        'SELECT numero_cuenta, saldo FROM usuarios WHERE numero_cuenta = ?',
+        [numero_cuenta_destino]
+      );
+      if (!cuentaDestino.length) {
+        await connection.rollback();
+        return res.status(404).json({ message: 'Cuenta de destino no encontrada' });
+      }
+
+      const updateQueryDestino = 'UPDATE usuarios SET saldo = saldo + ? WHERE numero_cuenta = ?';
+      await connection.query(updateQueryDestino, [monto, numero_cuenta_destino]);
+    }
+
+    await connection.commit();
+
+    res.json({ message: 'Transacción creada exitosamente', transaccionId: result.insertId });
+  } catch (error) {
+    console.error('Error al crear la transacción:', error);
+    if (connection) await connection.rollback();
+    res.status(500).send(error.message);
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
 export const metodosTransaccion = {
   postRegistrar,
   loginUsuario,
@@ -208,5 +293,6 @@ export const metodosTransaccion = {
   postPrestamo,
   putPerfilUsuario,
   getPerfilUsuario,
+  postTransaccion,
   corsMiddleware,
 };

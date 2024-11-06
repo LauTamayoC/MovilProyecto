@@ -3,7 +3,7 @@ import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'reac
 import { useUser } from '../../userContext.js';
 
 export default function EditProfileScreen({ route, navigation }) {
-  const { user } = useUser();
+  const { user, setUser } = useUser(); // Asegúrate de tener acceso a setUser
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [accountType, setAccountType] = useState('');
@@ -11,7 +11,7 @@ export default function EditProfileScreen({ route, navigation }) {
   useEffect(() => {
     const fetchEditProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:8081/editarUsuario/${user.id}`);
+        const response = await fetch(`http://localhost:3000/perfilUsuario/${user.id}`);
         if (!response.ok) {
           throw new Error('Error en la solicitud');
         }
@@ -42,7 +42,7 @@ export default function EditProfileScreen({ route, navigation }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:8081/editarUsuario/${user.id}`, {
+      const response = await fetch(`http://localhost:3000/editarUsuario/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -62,6 +62,8 @@ export default function EditProfileScreen({ route, navigation }) {
 
       if (data.message) {
         Alert.alert('Éxito', data.message);
+        // Actualiza el contexto del usuario con los nuevos datos
+        setUser({ ...user, nombre: name, email: email, tipo_cuenta: accountType });
         navigation.goBack();
       }
     } catch (error) {
