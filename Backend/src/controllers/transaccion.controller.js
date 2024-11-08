@@ -12,6 +12,29 @@ const corsMiddleware = (req, res, next) => {
   next();
 };
 
+const getPrincipal = async (req, res) => {
+  try {
+    const connection = await getConnection();
+    const { userId } = req.params;
+
+    const result = await connection.query('SELECT * FROM usuarios WHERE id = ?', [userId]);
+    const user = result[0][0];
+
+    if (!user) {
+      return res.status(404).json({ message: 'Cuenta no encontrada' });
+    }
+
+    res.json({
+      numero_cuenta: user.numero_cuenta,
+      tipo_cuenta: user.tipo_cuenta,
+      saldo: user.saldo,
+    });
+  } catch (error) {
+    console.error('Error al obtener la información de la cuenta del usuario:', error);
+    res.status(500).send(error.message);
+  }
+};
+
 // Login de Usuario
 const loginUsuario = async (req, res) => {
   try {
@@ -295,4 +318,5 @@ export const metodosTransaccion = {
   getPerfilUsuario,
   postTransaccion,
   corsMiddleware,
+  getPrincipal,
 };

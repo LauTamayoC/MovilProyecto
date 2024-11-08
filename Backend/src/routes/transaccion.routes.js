@@ -100,4 +100,12 @@ router.get(
   metodosTransaccion.getPerfilUsuario
 );
 
+router.get(
+  '/principal/:userId',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.getPrincipal
+);
+
 export default router;
