@@ -47,9 +47,11 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
+    <View style={styles.containerdef}>
+      <View style={styles.logoContainer}>
+        <Image source={require('../../assets/logodef.png')} style={styles.logo} />
+      </View>
     <View style={styles.container}>
-      <Image source={require('../../assets/logo.png')} style={styles.logo} />
-
       <Text style={styles.title}>Iniciar Sesión</Text>
       <TextInput
         placeholder='Email'
@@ -73,22 +75,30 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.buttonText}>Registrarse</Text>
       </TouchableOpacity>
     </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  containerdef: {
+    flex: 1,
+    backgroundColor: '#f0f0f5',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 20,
     backgroundColor: '#f0f0f5',
   },
+  logoContainer: {
+    flexDirection: 'row', // Asegura que los elementos se alineen en fila
+    justifyContent: 'flex-start', // Alinea a la izquierda
+    paddingTop: 10,
+    
+  },
   logo: {
-    width: 300,
-    height: 400,
-    alignSelf: 'center',
-    resizeMode: 'contain',
-    marginBottom: 30,
+    width: 200,
+    height: 200,
   },
   title: {
     fontSize: 24,
