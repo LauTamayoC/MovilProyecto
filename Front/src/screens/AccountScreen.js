@@ -10,7 +10,7 @@ export default function AccountScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('Número de cuenta del usuario:', user.numero_cuenta); // Agrega esto para depuración
+    console.log('Número de cuenta del usuario:', user.numero_cuenta); 
     if (!user.numero_cuenta) {
       console.error('Número de cuenta no proporcionado');
       setLoading(false);
