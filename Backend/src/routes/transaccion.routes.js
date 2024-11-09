@@ -1,6 +1,6 @@
 import cors from 'cors';
 import { Router } from 'express';
-import autenticarUsuario from '../authMiddleware.js';
+// import autenticarUsuario from '../authMiddleware.js';
 import { metodosTransaccion } from '../controllers/transaccion.controller.js';
 
 const router = Router();
@@ -10,7 +10,7 @@ router.post(
   cors({
     origin: 'http://localhost:8081',
   }),
-  autenticarUsuario,
+  // autenticarUsuario,
   metodosTransaccion.loginUsuario
 );
 
@@ -43,7 +43,7 @@ router.post(
   cors({
     origin: 'http://localhost:8081',
   }),
-  autenticarUsuario,
+  // autenticarUsuario,
   metodosTransaccion.postTransaccion
 );
 

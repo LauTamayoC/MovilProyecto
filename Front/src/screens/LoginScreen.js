@@ -30,12 +30,13 @@ export default function LoginScreen({ navigation }) {
       });
 
       const data = await response.json();
+      setUser({ id: data.userId, numero_cuenta: data.accountNumber });
+
       if (!response.ok) {
         Alert.alert('Error', data.message || 'Error en la solicitud');
         return;
       }
 
-      setUser({ id: data.userId, accountNumber: data.numero_cuenta, token: data.token });
       console.log('Usuario autenticado:', data);
       Alert.alert('Éxito', 'Inicio de sesión exitoso');
       navigation.replace('Main');
@@ -44,6 +45,7 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Error', 'No se pudo iniciar sesión. Verifica tu conexión.');
     }
   };
+
   return (
     <View style={styles.containerdef}>
       <View style={styles.logoContainer}>

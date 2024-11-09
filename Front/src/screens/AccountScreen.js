@@ -6,11 +6,12 @@ import { useUser } from '../../userContext.js';
 export default function AccountScreen() {
   const navigation = useNavigation();
   const { user } = useUser();
-  const [accountInfo, setAccountInfo] = useState(null);
+  const [accountInfo, setAccountInfo] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user.accountNumber) {
+    console.log('Número de cuenta del usuario:', user.numero_cuenta); // Agrega esto para depuración
+    if (!user.numero_cuenta) {
       console.error('Número de cuenta no proporcionado');
       setLoading(false);
       return;
@@ -18,7 +19,7 @@ export default function AccountScreen() {
 
     const fetchAccountInfo = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/cuenta/${user.accountNumber}`);
+        const response = await fetch(`http://localhost:3000/cuenta/${user.numero_cuenta}`);
         if (!response.ok) {
           throw new Error('Error al obtener la información de la cuenta');
         }

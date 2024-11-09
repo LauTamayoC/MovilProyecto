@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ReportScreen() {
   const navigation = useNavigation();
@@ -10,15 +10,12 @@ export default function ReportScreen() {
       <View style={styles.containerTitle}>
         <Text style={styles.acTitle}>Reportes Financieros</Text>
       </View>
-      
+
       <TouchableOpacity style={styles.button} onPress={() => {}}>
         <Text style={styles.buttonText}>Generar Reporte</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.button, styles.homeButton]}
-        onPress={() => navigation.navigate('Inicio')}
-      >
+      <TouchableOpacity style={[styles.button, styles.homeButton]} onPress={() => navigation.navigate('Inicio')}>
         <Text style={styles.buttonText}>Volver al Inicio</Text>
       </TouchableOpacity>
     </View>
@@ -26,40 +23,31 @@ export default function ReportScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: 
-  { flex: 1, 
-    justifyContent: 'center',
-    padding: 20 ,
+  container: { flex: 1, justifyContent: 'center', padding: 20 },
+  containerTitle: { flex: 1, justifyContent: 'center', padding: 20, alignItems: 'center' },
+  button: {
+    backgroundColor: '#8A05BE',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 15,
   },
-  containerTitle: 
-  { flex: 1, 
-    justifyContent: 'center',
-    padding: 20 ,
-    alignItems: 'center'
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-    button: {
-      backgroundColor: '#8A05BE', 
-      padding: 15,
-      borderRadius: 5,
-      alignItems: 'center',
-      marginBottom: 15,
-    },
-    buttonText: {
-      color: '#fff', 
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
-    button: {
-      backgroundColor: '#8A05BE', 
-      paddingVertical: 15,
-      borderRadius: 10,
-      alignItems: 'center',
-      marginTop: 20,
-    },
-    acTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: '#4A0072', 
-      marginBottom: 5,
-    },
+  button: {
+    backgroundColor: '#8A05BE',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  acTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4A0072',
+    marginBottom: 5,
+  },
 });

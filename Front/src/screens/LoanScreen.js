@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, Alert, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoanScreen() {
   const navigation = useNavigation();
@@ -60,32 +60,29 @@ export default function LoanScreen() {
 
   return (
     <View style={styles.container}>
-      <TextInput 
-        placeholder="Monto del Préstamo" 
+      <TextInput
+        placeholder='Monto del Préstamo'
         value={amount}
-        onChangeText={setAmount} 
+        onChangeText={setAmount}
         style={styles.input}
-        placeholderTextColor="#b19cd9"
-        keyboardType="numeric"
+        placeholderTextColor='#b19cd9'
+        keyboardType='numeric'
       />
 
-      <TextInput 
-        placeholder="Plazo (en meses)" 
-        value={term} 
-        onChangeText={setTerm} 
+      <TextInput
+        placeholder='Plazo (en meses)'
+        value={term}
+        onChangeText={setTerm}
         style={styles.input}
-        placeholderTextColor="#b19cd9"
-        keyboardType="numeric"
+        placeholderTextColor='#b19cd9'
+        keyboardType='numeric'
       />
-      
+
       <TouchableOpacity style={styles.button} onPress={solicitarPrestamo}>
         <Text style={styles.buttonText}>Solicitar préstamo</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.button, styles.homeButton]}
-        onPress={() => navigation.navigate('Inicio')}
-      >
+      <TouchableOpacity style={[styles.button, styles.homeButton]} onPress={() => navigation.navigate('Inicio')}>
         <Text style={styles.buttonText}>Volver al Inicio</Text>
       </TouchableOpacity>
 
@@ -109,10 +106,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f0f0f5', 
+    backgroundColor: '#f0f0f5',
   },
   button: {
-    backgroundColor: '#8A05BE', 
+    backgroundColor: '#8A05BE',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -120,16 +117,16 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#8A05BE', 
+    borderColor: '#8A05BE',
     padding: 10,
     borderRadius: 10,
     marginBottom: 15,
-    backgroundColor: '#fff', 
-    color: '#333', 
+    backgroundColor: '#fff',
+    color: '#333',
   },
   buttonText: {
     fontSize: 16,
-    color: '#fff', 
+    color: '#fff',
     fontWeight: 'bold',
   },
   loanItem: {

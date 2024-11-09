@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
- 
+
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -9,20 +9,20 @@ export default function RegisterScreen({ navigation }) {
   const [accountNumber, setAccountNumber] = useState('');
   const [accountType, setAccountType] = useState('');
   const [loading, setLoading] = useState(false);
- 
+
   const validateEmail = (email) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
- 
+
   const handleRegister = async () => {
     console.log('Intentando registrar usuario...');
- 
+
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Las contraseñas no coinciden');
       return;
     }
- 
+
     if (!name || !email || !password || !accountNumber || !accountType) {
       Alert.alert('Error', 'Todos los campos son obligatorios');
       return;
@@ -31,9 +31,9 @@ export default function RegisterScreen({ navigation }) {
       Alert.alert('Error', 'Formato de correo electrónico inválido');
       return;
     }
- 
+
     setLoading(true);
- 
+
     try {
       const response = await fetch('http://localhost:3000/registrar', {
         method: 'POST',
@@ -57,7 +57,7 @@ export default function RegisterScreen({ navigation }) {
           throw new Error('Error desconocido');
         }
       }
- 
+
       const data = await response.json();
       console.log('Usuario registrado:', data);
       Alert.alert('Éxito', 'Usuario registrado exitosamente');
@@ -69,7 +69,7 @@ export default function RegisterScreen({ navigation }) {
       setLoading(false);
     }
   };
- 
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Registro de Usuario</Text>
@@ -124,7 +124,7 @@ export default function RegisterScreen({ navigation }) {
     </View>
   );
 }
- 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,4 +161,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
- 
