@@ -14,8 +14,7 @@ router.use(cors(corsOptions));
 router.post('/login', metodosTransaccion.loginUsuario);
 router.post('/registrar', metodosTransaccion.postRegistrar);
 
-<<<<<<< HEAD
-=======
+
 router.get(
   '/transaccion/:numero_cuenta',
   cors({
@@ -31,7 +30,7 @@ router.post(
   }),
   metodosTransaccion.postTransaccion
 );
->>>>>>> b777f469339796ae746a09af7aa412a5a70cb8da
+
 
 router.get('/transacciones', metodosTransaccion.getTransacciones);
 router.get('/transaccioneshistory', metodosTransaccion.getTransaccionesHistory);
@@ -53,13 +52,9 @@ router.post(
   metodosTransaccion.postPrestamo
 );
 
-router.get(
-  '/prestamos',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.getPrestamos
-);
+
+router.get('/reportes/prestamos/:usuario_id', metodosTransaccion.getPrestamos);
+
 
 
 
@@ -67,7 +62,8 @@ router.get('/reportes/ingresos-egresos/:numero_cuenta', metodosTransaccion.getIn
 router.get('/reportes/transacciones/:numero_cuenta', metodosTransaccion.getResumenTransacciones);
 router.get('/reportes/estadisticas-mensuales/:numero_cuenta', metodosTransaccion.getEstadisticasMensuales);
 router.get('/reportes/balance/:numero_cuenta', metodosTransaccion.getBalance);
-router.get('/reportes/prestamos/:numero_cuenta', metodosTransaccion.getResumenPrestamos);
+router.get('/reportes/prestamos/:usuario_id', metodosTransaccion.getPrestamos);
+
 
 
 

@@ -44,9 +44,9 @@ export default function TransactionScreen() {
       Alert.alert('Error', 'Todos los campos son requeridos');
       return;
     }
-
+  
     console.log('Iniciando transacción con:', { amount, type, accountNumber, originAccountNumber });
-
+  
     try {
       const response = await fetch('http://localhost:3000/transaccion', {
         method: 'POST',
@@ -54,17 +54,16 @@ export default function TransactionScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tipo: type,
-          monto: parseFloat(amount),
-          numero_cuenta_origen: originAccountNumber,
-          numero_cuenta_destino: type.toLowerCase() !== 'retiro' ? accountNumber : null,
+          tipo: type, // Tipo de transacción: "transferencia", "deposito" o "retiro"
+          monto: parseFloat(amount), // Convertir monto a número
+          numero_cuenta: originAccountNumber, // Cuenta de origen
+          numero_cuenta_destino: type.toLowerCase() !== 'retiro' ? accountNumber : null, // Solo en transferencias
         }),
       });
-
+  
       const data = await response.json();
-
       console.log('Datos recibidos:', data);
-
+  
       if (response.ok) {
         let successMessage = '';
         switch (type.toLowerCase()) {
@@ -89,7 +88,7 @@ export default function TransactionScreen() {
       setMessage('No se pudo conectar con el servidor');
     }
   };
-
+  
   return (
     <View style={styles.container}>
       <TextInput

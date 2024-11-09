@@ -12,7 +12,7 @@ export default function LoanScreen() {
 
   const solicitarPrestamo = async () => {
     const data = {
-      numero_cuenta: user.numero_cuenta, // Incluir el número de cuenta en la solicitud
+      usuario_id: user.id, 
       monto: amount,
       plazo: term,
     };
@@ -25,7 +25,7 @@ export default function LoanScreen() {
         },
         body: JSON.stringify(data),
       });
-
+  
       const result = await response.json();
       if (response.ok) {
         Alert.alert('Éxito', result.message);
@@ -39,23 +39,25 @@ export default function LoanScreen() {
     }
   };
 
-  const obtenerPrestamos = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/reportes/prestamos/${user.numero_cuenta}`, {
-        method: 'GET',
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        setLoans(result); // Almacena la lista de préstamos en el estado
-      } else {
-        Alert.alert('Error', 'Error al obtener préstamos: ' + result.message);
+  
+    const obtenerPrestamos = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/reportes/prestamos/${user.id}`, {
+          method: 'GET',
+        });
+    
+        const result = await response.json();
+        if (response.ok) {
+          setLoans(result); // Almacena la lista de préstamos en el estado
+        } else {
+          Alert.alert('Error', 'Error al obtener préstamos: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        Alert.alert('Error', 'No se pudieron obtener los préstamos');
       }
-    } catch (error) {
-      console.error('Error:', error);
-      Alert.alert('Error', 'No se pudieron obtener los préstamos');
-    }
-  };
+    };
+    
 
   useEffect(() => {
     obtenerPrestamos(); // Llama a obtenerPrestamos al cargar la pantalla

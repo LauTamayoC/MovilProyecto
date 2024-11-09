@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
 import { getConnection } from '../database/database.js';
+import { pool } from '../database/database.js';
+
 
 // Middleware para CORS
 const corsMiddleware = (req, res, next) => {
@@ -55,10 +57,7 @@ const loginUsuario = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-=======
-//Registrar Usuario
->>>>>>> b777f469339796ae746a09af7aa412a5a70cb8da
+
 const postRegistrar = async (req, res) => {
   try {
     const connection = await getConnection();
@@ -114,29 +113,54 @@ const getUsuarios = async (req, res) => {
 const getPrestamos = async (req, res) => {
   try {
     const connection = await getConnection();
-    const result = await connection.query('SELECT * FROM prestamos');
-    res.json(result[0]);
+    const { usuario_id } = req.params; 
+
+    
+    if (!usuario_id) {
+      return res.status(400).json({ message: 'El ID del usuario es requerido' });
+    }
+
+    
+    const [result] = await connection.query(
+      'SELECT * FROM prestamos WHERE usuario_id = ?',
+      [usuario_id]
+    );
+
+    
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron préstamos para este usuario' });
+    }
+
+    
+    res.json(result);
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al obtener los préstamos:', error);
+    res.status(500).json({ message: 'Error al obtener los préstamos', error: error.message });
   }
 };
+
 
 const postPrestamo = async (req, res) => {
   try {
     const connection = await getConnection();
-    const { monto, plazo } = req.body;
+    const { usuario_id, monto, plazo } = req.body; // Cambiamos numero_cuenta por usuario_id
 
-    if (!monto || !plazo) {
-      return res.status(400).json({ message: 'Monto y plazo son requeridos' });
+    if (!usuario_id || !monto || !plazo) {
+      return res.status(400).json({ message: 'Usuario ID, monto y plazo son requeridos' });
     }
 
-    const result = await connection.query('INSERT INTO prestamos (monto, plazo) VALUES (?, ?)', [monto, plazo]);
+    const result = await connection.query(
+      'INSERT INTO prestamos (usuario_id, monto, plazo, estado, fecha_solicitud) VALUES (?, ?, ?, "pendiente", NOW())',
+      [usuario_id, monto, plazo]
+    );
 
     res.json({ message: 'Préstamo solicitado exitosamente', prestamoId: result.insertId });
   } catch (error) {
+    console.error('Error al crear el préstamo:', error);
     res.status(500).send(error.message);
   }
 };
+
 
 
 
@@ -210,29 +234,15 @@ const getPerfilUsuario = async (req, res) => {
 };
 
 export const getCuentaOrigen = async (req, res) => {
-<<<<<<< HEAD
   try {
     const connection = await getConnection();
     const { numero_cuenta } = req.params;
 
-    const result = await connection.query('SELECT numero_cuenta FROM usuarios WHERE numero_cuenta = ?', [
-      numero_cuenta,
-    ]);
-    const cuenta = result[0];
-
-    if (!cuenta) {
-      return res.status(404).json({ message: 'Cuenta no encontrada' });
-    }
-
-    res.json(cuenta);
-=======
-  try {
-    const connection = await getConnection();
-    const { numero_cuenta } = req.params;
-
-    const result = await connection.query('SELECT numero_cuenta FROM usuarios WHERE numero_cuenta = ?', [
-      numero_cuenta,
-    ]);
+    const result = await connection.query(
+      'SELECT numero_cuenta FROM usuarios WHERE numero_cuenta = ?', 
+      [numero_cuenta]
+    );
+    
     const cuenta = result[0];
 
     if (!cuenta) {
@@ -249,89 +259,38 @@ export const getCuentaOrigen = async (req, res) => {
 const postTransaccion = async (req, res) => {
   let connection;
   try {
+    const { tipo, monto, numero_cuenta } = req.body;
+
+    // Validación de datos
+    if (!tipo || !monto || !numero_cuenta) {
+      return res.status(400).json({ message: 'Tipo, monto y número de cuenta son requeridos' });
+    }
+
+    
     connection = await pool.getConnection();
-    const { tipo, monto, numero_cuenta_origen, numero_cuenta_destino } = req.body;
 
-    // Validar los campos requeridos
-    if (!tipo || !monto || !numero_cuenta_origen || (tipo.toLowerCase() !== 'retiro' && !numero_cuenta_destino)) {
-      return res.status(400).json({ message: 'Tipo, monto y números de cuenta son requeridos' });
-    }
+    
+    const result = await connection.query(
+      'INSERT INTO transacciones (numero_cuenta, tipo, monto, fecha) VALUES (?, ?, ?, NOW())',
+      [numero_cuenta, tipo, monto]
+    );
 
-    // Validar que el monto sea un número positivo
-    if (isNaN(monto) || monto <= 0) {
-      return res.status(400).json({ message: 'El monto debe ser un número positivo' });
-    }
-
-    // Obtener la cuenta de origen
-    const [cuentaOrigen] = await connection.query('SELECT numero_cuenta, saldo FROM usuarios WHERE numero_cuenta = ?', [
-      numero_cuenta_origen,
-    ]);
-
-    if (cuentaOrigen.length) {
-      const saldoOrigen = cuentaOrigen[0].saldo;
-
-      // Validar el tipo de transacción
-      const tiposValidos = ['transferencia', 'retiro', 'deposito'];
-      if (!tiposValidos.includes(tipo.toLowerCase())) {
-        return res.status(400).json({ message: 'Tipo de transacción no válido' });
-      }
-
-      // Validar saldo suficiente para transferencias y retiros
-      if ((tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'retiro') && saldoOrigen < monto) {
-        return res.status(400).json({ message: 'Saldo insuficiente' });
-      }
-
-      await connection.beginTransaction();
-
-      // Insertar la transacción
-      const result = await connection.query('INSERT INTO transacciones (numero_cuenta, tipo, monto) VALUES (?, ?, ?)', [
-        numero_cuenta_origen,
-        tipo,
-        monto,
-      ]);
-
-      // Actualizar el saldo de la cuenta de origen
-      let updateQueryOrigen;
-      if (tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'retiro') {
-        updateQueryOrigen = 'UPDATE usuarios SET saldo = saldo - ? WHERE numero_cuenta = ?';
-      } else if (tipo.toLowerCase() === 'deposito') {
-        updateQueryOrigen = 'UPDATE usuarios SET saldo = saldo - ? WHERE numero_cuenta = ?'; // Cambiado a resta
-      }
-
-      await connection.query(updateQueryOrigen, [monto, numero_cuenta_origen]);
-
-      // Si es una transferencia o depósito, actualizar el saldo de la cuenta de destino
-      if (tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'deposito') {
-        const [cuentaDestino] = await connection.query(
-          'SELECT numero_cuenta, saldo FROM usuarios WHERE numero_cuenta = ?',
-          [numero_cuenta_destino]
-        );
-        if (!cuentaDestino.length) {
-          await connection.rollback();
-          return res.status(404).json({ message: 'Cuenta de destino no encontrada' });
-        }
-
-        const updateQueryDestino = 'UPDATE usuarios SET saldo = saldo + ? WHERE numero_cuenta = ?';
-        await connection.query(updateQueryDestino, [monto, numero_cuenta_destino]);
-      }
-
-      await connection.commit();
-
-      res.json({ message: 'Transacción creada exitosamente', transaccionId: result.insertId });
-    } else {
-      return res.status(404).json({ message: 'Cuenta de origen no encontrada' });
-    }
->>>>>>> b777f469339796ae746a09af7aa412a5a70cb8da
+    
+    res.status(201).json({ message: 'Transacción creada exitosamente', transaccionId: result[0].insertId });
   } catch (error) {
-    console.error('Error al obtener la cuenta:', error);
-    res.status(500).send(error.message);
+    console.error('Error al crear la transacción:', error);
+    res.status(500).json({ message: 'Error al crear la transacción', error: error.message });
+  } finally {
+    if (connection) connection.release();
   }
 };
+
 
 const getIngresosEgresos = async (req, res) => {
   try {
     const connection = await getConnection();
     const { numero_cuenta } = req.params;
+
     const [result] = await connection.query(`
       SELECT 
         SUM(CASE WHEN tipo = 'deposito' THEN monto ELSE 0 END) AS ingresos,
@@ -339,9 +298,11 @@ const getIngresosEgresos = async (req, res) => {
       FROM transacciones
       WHERE numero_cuenta = ? AND fecha >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
     `, [numero_cuenta]);
-    res.json(result[0]);
+
+    res.json(result[0] || {});
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al obtener ingresos y egresos:', error);
+    res.status(500).json({ message: 'Error al obtener ingresos y egresos', error: error.message });
   }
 };
 
@@ -349,15 +310,18 @@ const getResumenTransacciones = async (req, res) => {
   try {
     const connection = await getConnection();
     const { numero_cuenta } = req.params;
+
     const [result] = await connection.query(`
       SELECT tipo, COUNT(*) AS cantidad, SUM(monto) AS total
       FROM transacciones
       WHERE numero_cuenta = ? AND fecha >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
       GROUP BY tipo
     `, [numero_cuenta]);
-    res.json(result);
+
+    res.json(result || []);
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al obtener el resumen de transacciones:', error);
+    res.status(500).json({ message: 'Error al obtener el resumen de transacciones', error: error.message });
   }
 };
 
@@ -365,6 +329,7 @@ const getEstadisticasMensuales = async (req, res) => {
   try {
     const connection = await getConnection();
     const { numero_cuenta } = req.params;
+
     const [result] = await connection.query(`
       SELECT 
         DATE_FORMAT(fecha, '%Y-%m') AS mes,
@@ -375,9 +340,11 @@ const getEstadisticasMensuales = async (req, res) => {
       GROUP BY mes
       ORDER BY mes
     `, [numero_cuenta]);
-    res.json(result);
+
+    res.json(result || []);
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error al obtener estadísticas mensuales:', error);
+    res.status(500).json({ message: 'Error al obtener estadísticas mensuales', error: error.message });
   }
 };
 
@@ -398,28 +365,28 @@ const getBalance = async (req, res) => {
     res.json({ saldo: result[0].saldo });
   } catch (error) {
     console.error('Error al obtener el balance:', error);
-    res.status(500).send(error.message);
+    res.status(500).json({ message: 'Error al obtener el balance', error: error.message });
   }
 };
+
 const getResumenPrestamos = async (req, res) => {
   try {
     const connection = await getConnection();
-    const { numero_cuenta } = req.params;
+    const { usuario_id } = req.params;
 
-    // Suponiendo que tienes una tabla `prestamos` con una columna `numero_cuenta`
     const [result] = await connection.query(
-      'SELECT * FROM prestamos WHERE numero_cuenta = ?',
-      [numero_cuenta]
+      'SELECT * FROM prestamos WHERE usuario_id = ?',
+      [usuario_id]
     );
 
     if (!result.length) {
-      return res.status(404).json({ message: 'No se encontraron préstamos para esta cuenta' });
+      return res.status(404).json({ message: 'No se encontraron préstamos para este usuario' });
     }
 
-    res.json(result); // Devuelve el resumen de préstamos en formato JSON
+    res.json(result);
   } catch (error) {
     console.error('Error al obtener el resumen de préstamos:', error);
-    res.status(500).send(error.message);
+    res.status(500).json({ message: 'Error al obtener el resumen de préstamos', error: error.message });
   }
 };
 
@@ -445,10 +412,9 @@ export const metodosTransaccion = {
   postPrestamo,
   putPerfilUsuario,
   getPerfilUsuario,
-<<<<<<< HEAD
-=======
+
   postTransaccion,
->>>>>>> b777f469339796ae746a09af7aa412a5a70cb8da
+
   getCuentaOrigen,
   corsMiddleware,
   getBalance,
