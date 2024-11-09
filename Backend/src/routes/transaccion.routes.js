@@ -1,59 +1,31 @@
 import cors from 'cors';
 import { Router } from 'express';
-// import autenticarUsuario from '../authMiddleware.js';
 import { metodosTransaccion } from '../controllers/transaccion.controller.js';
 
 const router = Router();
 
-router.post(
-  '/login',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  // autenticarUsuario,
-  metodosTransaccion.loginUsuario
-);
+const corsOptions = {
+  origin: 'http://localhost:8081',
+};
 
-router.post(
-  '/registrar',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.postRegistrar
-);
+router.use(cors(corsOptions));
 
-router.get(
-  '/transacciones',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.getTransacciones
-);
 
-router.get(
-  '/transaccioneshistory',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.getTransaccionesHistory
-);
+router.post('/login', metodosTransaccion.loginUsuario);
+router.post('/registrar', metodosTransaccion.postRegistrar);
 
-router.post(
-  '/transaccion',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  // autenticarUsuario,
-  metodosTransaccion.postTransaccion
-);
 
-router.get(
-  '/usuarios',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.getUsuarios
-);
+router.get('/transacciones', metodosTransaccion.getTransacciones);
+router.get('/transaccioneshistory', metodosTransaccion.getTransaccionesHistory);
+router.get('/transaccion/:numero_cuenta', metodosTransaccion.getCuentaOrigen);
+
+
+router.get('/usuarios', metodosTransaccion.getUsuarios);
+router.get('/cuenta/:numero_cuenta', metodosTransaccion.getCuenta);
+router.put('/editarUsuario/:userId', metodosTransaccion.putPerfilUsuario);
+router.get('/perfilUsuario/:userId', metodosTransaccion.getPerfilUsuario);
+router.get('/principal/:userId', metodosTransaccion.getPrincipal);
+
 
 router.post(
   '/prestamos',
@@ -71,44 +43,14 @@ router.get(
   metodosTransaccion.getPrestamos
 );
 
-router.get(
-  '/reportes',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.getReportes
-);
 
-router.get(
-  '/cuenta/:numero_cuenta',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.getCuenta
-);
 
-router.put(
-  '/editarUsuario/:userId',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.putPerfilUsuario
-);
+router.get('/reportes/ingresos-egresos/:numero_cuenta', metodosTransaccion.getIngresosEgresos);
+router.get('/reportes/transacciones/:numero_cuenta', metodosTransaccion.getResumenTransacciones);
+router.get('/reportes/estadisticas-mensuales/:numero_cuenta', metodosTransaccion.getEstadisticasMensuales);
+router.get('/reportes/balance/:numero_cuenta', metodosTransaccion.getBalance);
+router.get('/reportes/prestamos/:numero_cuenta', metodosTransaccion.getResumenPrestamos);
 
-router.get(
-  '/perfilUsuario/:userId',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.getPerfilUsuario
-);
 
-router.get(
-  '/principal/:userId',
-  cors({
-    origin: 'http://localhost:8081',
-  }),
-  metodosTransaccion.getPrincipal
-);
 
 export default router;

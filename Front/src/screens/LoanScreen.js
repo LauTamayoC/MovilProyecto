@@ -1,15 +1,18 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useUser } from '../../userContext';
 
 export default function LoanScreen() {
   const navigation = useNavigation();
+  const { user } = useUser(); // Obtener el usuario actual del contexto, incluyendo `numero_cuenta`
   const [amount, setAmount] = useState('');
   const [term, setTerm] = useState('');
   const [loans, setLoans] = useState([]); // Estado para almacenar los préstamos obtenidos
 
   const solicitarPrestamo = async () => {
     const data = {
+      numero_cuenta: user.numero_cuenta, // Incluir el número de cuenta en la solicitud
       monto: amount,
       plazo: term,
     };
@@ -38,7 +41,7 @@ export default function LoanScreen() {
 
   const obtenerPrestamos = async () => {
     try {
-      const response = await fetch('http://localhost:3000/prestamos', {
+      const response = await fetch(`http://localhost:3000/reportes/prestamos/${user.numero_cuenta}`, {
         method: 'GET',
       });
 

@@ -12,11 +12,13 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Error', 'Todos los campos son obligatorios');
       return;
     }
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Alert.alert('Error', 'Formato de email inválido');
       return;
     }
+  
     try {
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
@@ -28,15 +30,18 @@ export default function LoginScreen({ navigation }) {
           contrasena: password,
         }),
       });
-
-      const data = await response.json();
-      setUser({ id: data.userId, numero_cuenta: data.accountNumber });
-
+  
+      // Verifica si la respuesta es exitosa antes de procesar JSON
       if (!response.ok) {
-        Alert.alert('Error', data.message || 'Error en la solicitud');
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData ? errorData.message : 'Error en el servidor';
+        Alert.alert('Error', errorMessage);
         return;
       }
-
+  
+      const data = await response.json(); // Convierte la respuesta a JSON
+      setUser({ id: data.userId, numero_cuenta: data.accountNumber });
+  
       console.log('Usuario autenticado:', data);
       Alert.alert('Éxito', 'Inicio de sesión exitoso');
       navigation.replace('Main');
@@ -45,6 +50,7 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Error', 'No se pudo iniciar sesión. Verifica tu conexión.');
     }
   };
+  
 
   return (
     <View style={styles.containerdef}>
