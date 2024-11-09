@@ -14,6 +14,24 @@ router.use(cors(corsOptions));
 router.post('/login', metodosTransaccion.loginUsuario);
 router.post('/registrar', metodosTransaccion.postRegistrar);
 
+<<<<<<< HEAD
+=======
+router.get(
+  '/transaccion/:numero_cuenta',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.getCuentaOrigen
+);
+
+router.post(
+  '/transaccion',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.postTransaccion
+);
+>>>>>>> b777f469339796ae746a09af7aa412a5a70cb8da
 
 router.get('/transacciones', metodosTransaccion.getTransacciones);
 router.get('/transaccioneshistory', metodosTransaccion.getTransaccionesHistory);
