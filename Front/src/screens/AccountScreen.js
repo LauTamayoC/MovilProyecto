@@ -1,17 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useUser } from '../../userContext.js';
 
 export default function AccountScreen() {
   const navigation = useNavigation();
+  const { user } = useUser();
   const [accountInfo, setAccountInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user.accountNumber) {
+      console.error('Número de cuenta no proporcionado');
+      setLoading(false);
+      return;
+    }
+
     const fetchAccountInfo = async () => {
       try {
-        const response = await fetch('http://localhost:3000/cuenta/numero_cuenta');
+        const response = await fetch(`http://localhost:3000/cuenta/${user.accountNumber}`);
+        if (!response.ok) {
+          throw new Error('Error al obtener la información de la cuenta');
+        }
         const data = await response.json();
+        console.log('Datos de la cuenta:', data);
         setAccountInfo(data);
       } catch (error) {
         console.error('Error fetching account info:', error);
@@ -19,34 +31,34 @@ export default function AccountScreen() {
         setLoading(false);
       }
     };
+
     fetchAccountInfo();
-  }, []);
+  }, [user.accountNumber]);
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(value);
+  };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#8A05BE" style={{ flex: 1, justifyContent: 'center' }} />;
+    return <ActivityIndicator size='large' color='#8A05BE' style={{ flex: 1, justifyContent: 'center' }} />;
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.accountTitle}>Información de la Cuenta</Text>
-      <View style={styles.accountInfoContainer}>
-        <Text style={styles.accountInfoText}>Saldo Actual:</Text>
-        <Text style={styles.accountInfoBalance}>
-          {accountInfo && typeof accountInfo.saldo === 'number' ? `$${accountInfo.saldo.toFixed(2)}` : 'Saldo no disponible'}
-        </Text>
-      </View>
+      {accountInfo ? (
+        <View style={styles.accountInfoContainer}>
+          <Text style={styles.accountInfoText}>Saldo Actual:</Text>
+          <Text style={styles.accountInfoBalance}>{formatCurrency(accountInfo.saldo)}</Text>
+        </View>
+      ) : (
+        <Text style={styles.errorText}>No se pudo obtener la información de la cuenta</Text>
+      )}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('TransactionHistory')}
-        >
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TransactionHistory')}>
           <Text style={styles.buttonText}>Ver Historial de Transacciones</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.homeButton]}
-          onPress={() => navigation.navigate('Inicio')}
-        >
+        <TouchableOpacity style={[styles.button, styles.homeButton]} onPress={() => navigation.navigate('Inicio')}>
           <Text style={styles.buttonText}>Volver al Inicio</Text>
         </TouchableOpacity>
       </View>
@@ -55,14 +67,14 @@ export default function AccountScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    justifyContent: 'center', 
+  container: {
+    flex: 1,
+    justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f0f0f5',  
+    backgroundColor: '#f0f0f5',
   },
   button: {
-    backgroundColor: '#8A05BE', 
+    backgroundColor: '#8A05BE',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -70,13 +82,13 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    color: '#fff', 
+    color: '#fff',
     fontWeight: 'bold',
   },
   accountTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#8A05BE', 
+    color: '#8A05BE',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -94,16 +106,21 @@ const styles = StyleSheet.create({
   },
   accountInfoText: {
     fontSize: 18,
-    color: '#4A0072', 
+    color: '#4A0072',
   },
   accountInfoBalance: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#8A05BE', 
+    color: '#8A05BE',
     marginTop: 10,
   },
   buttonContainer: {
     width: '100%',
     marginTop: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
   },
 });

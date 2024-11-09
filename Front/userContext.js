@@ -5,7 +5,7 @@ const UserContext = createContext();
 
 // Proveedor del contexto del usuario
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState('');
+  const [user, setUser] = useState({ id: '', accountNumber: '' });
 
   return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
 };

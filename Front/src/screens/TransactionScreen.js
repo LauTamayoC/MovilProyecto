@@ -4,23 +4,22 @@ import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'reac
 
 export default function TransactionScreen() {
   const navigation = useNavigation();
+  const token = 'tu_token_jwt';
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
-
   const handleTransaction = async () => {
     if (!amount || !type || !accountNumber) {
       Alert.alert('Error', 'Todos los campos son requeridos');
       return;
     }
-
     console.log('Iniciando transacción con:', { amount, type, accountNumber });
-
     try {
       const response = await fetch('http://localhost:3000/transaccion', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           tipo: type,
@@ -28,11 +27,8 @@ export default function TransactionScreen() {
           numero_cuenta_destino: accountNumber,
         }),
       });
-
       const data = await response.json();
-
       console.log('Datos recibidos:', data);
-
       if (response.ok) {
         Alert.alert('Éxito', 'Transacción creada exitosamente');
       } else {
@@ -43,7 +39,6 @@ export default function TransactionScreen() {
       Alert.alert('Error', 'No se pudo conectar con el servidor');
     }
   };
-
   return (
     <View style={styles.container}>
       <TextInput
@@ -62,7 +57,6 @@ export default function TransactionScreen() {
         style={styles.input}
         placeholderTextColor='#b19cd9'
       />
-
       <TextInput
         placeholder='Número de cuenta'
         value={accountNumber}
@@ -89,8 +83,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
     backgroundColor: '#f0f0f5',
+    backgroundColor: '#f0f0f5',
   },
   button: {
+    backgroundColor: '#8A05BE',
     backgroundColor: '#8A05BE',
     paddingVertical: 15,
     borderRadius: 10,
@@ -105,9 +101,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#fff',
     color: '#333',
+    backgroundColor: '#fff',
+    color: '#333',
   },
   buttonText: {
     fontSize: 16,
+    color: '#fff',
     color: '#fff',
     fontWeight: 'bold',
   },

@@ -1,11 +1,11 @@
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
-import router from './routes/transaccion.routes.js';
+import transaccionRouter from './routes/transaccion.routes.js';
 
 const app = express();
 
-// Configuracion
+// Configuración
 app.set('port', process.env.PORT || 3000);
 
 // Middleware para parsear JSON
@@ -18,6 +18,6 @@ app.use(
 app.use(morgan('dev'));
 
 // Rutas
-app.use(router);
+app.use('/api', transaccionRouter);
 
 export default app;

@@ -22,6 +22,10 @@ export default function HomeScreen({ navigation }) {
     fetchAccountInfo();
   }, [user.id]);
 
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(value);
+  };
+
   useEffect(() => {
     console.log(accountInfo);
   }, [accountInfo]);
@@ -42,7 +46,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.accountInfoContainer}>
           <Text style={styles.accountTitle}>{accountInfo.tipo_cuenta}</Text>
           <Text style={styles.accountNumber}>{accountInfo.numero_cuenta}</Text>
-          <Text style={styles.balance}>${accountInfo.saldo}</Text>
+          <Text style={styles.balance}>{formatCurrency(accountInfo.saldo)}</Text>
         </View>
       ) : (
         <Text>Cargando...</Text>

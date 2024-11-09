@@ -30,13 +30,12 @@ export default function LoginScreen({ navigation }) {
       });
 
       const data = await response.json();
-      setUser({ id: data.userId });
-
       if (!response.ok) {
         Alert.alert('Error', data.message || 'Error en la solicitud');
         return;
       }
 
+      setUser({ id: data.userId, accountNumber: data.numero_cuenta, token: data.token });
       console.log('Usuario autenticado:', data);
       Alert.alert('Éxito', 'Inicio de sesión exitoso');
       navigation.replace('Main');
@@ -45,36 +44,38 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Error', 'No se pudo iniciar sesión. Verifica tu conexión.');
     }
   };
-
   return (
     <View style={styles.containerdef}>
       <View style={styles.logoContainer}>
         <Image source={require('../../assets/logodef.png')} style={styles.logo} />
       </View>
-    <View style={styles.container}>
-      <Text style={styles.title}>Iniciar Sesión</Text>
-      <TextInput
-        placeholder='Email'
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-        placeholderTextColor='#b19cd9'
-      />
-      <TextInput
-        placeholder='Contraseña'
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-        placeholderTextColor='#b19cd9'
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={() => navigation.navigate('Register')}>
-        <Text style={styles.buttonText}>Registrarse</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={styles.container}>
+        <Text style={styles.title}>Iniciar Sesión</Text>
+        <TextInput
+          placeholder='Email'
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          placeholderTextColor='#b19cd9'
+        />
+        <TextInput
+          placeholder='Contraseña'
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+          placeholderTextColor='#b19cd9'
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.secondaryButton]}
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -94,7 +95,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Asegura que los elementos se alineen en fila
     justifyContent: 'flex-start', // Alinea a la izquierda
     paddingTop: 10,
-    
   },
   logo: {
     width: 200,
