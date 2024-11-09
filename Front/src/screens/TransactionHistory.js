@@ -47,7 +47,11 @@ export default function TransactionHistoryScreen() {
       />
       <TouchableOpacity style={[styles.button, styles.homeButton]} onPress={() => navigation.navigate('Cuenta')}>
         <Text style={styles.buttonText}>Volver a tus usuarios</Text>
+        
       </TouchableOpacity>
+      <TouchableOpacity style={[styles.button, styles.homeButton]} onPress={() => navigation.navigate('Inicio')}>
+          <Text style={styles.buttonText}>Volver al Inicio</Text>
+        </TouchableOpacity>
     </View>
   );
 }
