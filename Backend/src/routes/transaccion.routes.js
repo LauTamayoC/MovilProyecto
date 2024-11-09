@@ -38,12 +38,19 @@ router.get(
   metodosTransaccion.getTransaccionesHistory
 );
 
+router.get(
+  '/transaccion/:numero_cuenta',
+  cors({
+    origin: 'http://localhost:8081',
+  }),
+  metodosTransaccion.getCuentaOrigen
+);
+
 router.post(
   '/transaccion',
   cors({
     origin: 'http://localhost:8081',
   }),
-  // autenticarUsuario,
   metodosTransaccion.postTransaccion
 );
 

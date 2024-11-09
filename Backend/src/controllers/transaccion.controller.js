@@ -39,28 +39,22 @@ const getPrincipal = async (req, res) => {
 const loginUsuario = async (req, res) => {
   try {
     const connection = await getConnection();
-    const { email, contrasena } = req.body;
+    const { email } = req.body;
 
     const result = await connection.query('SELECT * FROM usuarios WHERE email = ?', [email]);
     const user = result[0][0];
 
     if (!user) {
-      return res.status(401).json({ message: 'Email o contraseña incorrectos' });
-    }
-
-    const isMatch = await bcrypt.compare(contrasena, user.contrasena);
-
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Email o contraseña incorrectos' });
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
     res.json({ message: 'Inicio de sesión exitoso', userId: user.id, accountNumber: user.numero_cuenta });
-    console.log('Respuesta del servidor:', { userId: user.id, accountNumber: user.numero_cuenta });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
     res.status(500).send(error.message);
   }
 };
+
 //Registrar Usuario
 const postRegistrar = async (req, res) => {
   try {
@@ -221,82 +215,102 @@ const getPerfilUsuario = async (req, res) => {
   }
 };
 
+export const getCuentaOrigen = async (req, res) => {
+  try {
+    const connection = await getConnection();
+    const { numero_cuenta } = req.params;
+
+    const result = await connection.query('SELECT numero_cuenta FROM usuarios WHERE numero_cuenta = ?', [
+      numero_cuenta,
+    ]);
+    const cuenta = result[0];
+
+    if (!cuenta) {
+      return res.status(404).json({ message: 'Cuenta no encontrada' });
+    }
+
+    res.json(cuenta);
+  } catch (error) {
+    console.error('Error al obtener la cuenta:', error);
+    res.status(500).send(error.message);
+  }
+};
+
 const postTransaccion = async (req, res) => {
   let connection;
   try {
-    if (!req.user || !req.user.numero_cuenta) {
-      return res.status(401).json({ message: 'Usuario no autenticado' });
-    }
-
     connection = await pool.getConnection();
-    const { tipo, monto, numero_cuenta_destino } = req.body;
-    const numero_cuenta_origen = req.user.numero_cuenta;
+    const { tipo, monto, numero_cuenta_origen, numero_cuenta_destino } = req.body;
 
-    if (
-      !tipo ||
-      !monto ||
-      !numero_cuenta_origen ||
-      (tipo.toLowerCase() === 'transferencia' && !numero_cuenta_destino)
-    ) {
-      return res.status(400).json({ message: 'Tipo, monto y número de cuenta son requeridos' });
+    // Validar los campos requeridos
+    if (!tipo || !monto || !numero_cuenta_origen || (tipo.toLowerCase() !== 'retiro' && !numero_cuenta_destino)) {
+      return res.status(400).json({ message: 'Tipo, monto y números de cuenta son requeridos' });
     }
 
+    // Validar que el monto sea un número positivo
     if (isNaN(monto) || monto <= 0) {
       return res.status(400).json({ message: 'El monto debe ser un número positivo' });
     }
 
+    // Obtener la cuenta de origen
     const [cuentaOrigen] = await connection.query('SELECT numero_cuenta, saldo FROM usuarios WHERE numero_cuenta = ?', [
       numero_cuenta_origen,
     ]);
-    if (!cuentaOrigen.length) {
-      return res.status(404).json({ message: 'Cuenta de origen no encontrada' });
-    }
 
-    const saldoOrigen = cuentaOrigen[0].saldo;
+    if (cuentaOrigen.length) {
+      const saldoOrigen = cuentaOrigen[0].saldo;
 
-    const tiposValidos = ['transferencia', 'retiro', 'deposito'];
-    if (!tiposValidos.includes(tipo.toLowerCase())) {
-      return res.status(400).json({ message: 'Tipo de transacción no válido' });
-    }
-
-    if ((tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'retiro') && saldoOrigen < monto) {
-      return res.status(400).json({ message: 'Saldo insuficiente' });
-    }
-
-    await connection.beginTransaction();
-
-    const result = await connection.query('INSERT INTO transacciones (numero_cuenta, tipo, monto) VALUES (?, ?, ?)', [
-      numero_cuenta_origen,
-      tipo,
-      monto,
-    ]);
-
-    let updateQueryOrigen;
-    if (tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'retiro') {
-      updateQueryOrigen = 'UPDATE usuarios SET saldo = saldo - ? WHERE numero_cuenta = ?';
-    } else if (tipo.toLowerCase() === 'deposito') {
-      updateQueryOrigen = 'UPDATE usuarios SET saldo = saldo + ? WHERE numero_cuenta = ?';
-    }
-
-    await connection.query(updateQueryOrigen, [monto, numero_cuenta_origen]);
-
-    if (tipo.toLowerCase() === 'transferencia') {
-      const [cuentaDestino] = await connection.query(
-        'SELECT numero_cuenta, saldo FROM usuarios WHERE numero_cuenta = ?',
-        [numero_cuenta_destino]
-      );
-      if (!cuentaDestino.length) {
-        await connection.rollback();
-        return res.status(404).json({ message: 'Cuenta de destino no encontrada' });
+      // Validar el tipo de transacción
+      const tiposValidos = ['transferencia', 'retiro', 'deposito'];
+      if (!tiposValidos.includes(tipo.toLowerCase())) {
+        return res.status(400).json({ message: 'Tipo de transacción no válido' });
       }
 
-      const updateQueryDestino = 'UPDATE usuarios SET saldo = saldo + ? WHERE numero_cuenta = ?';
-      await connection.query(updateQueryDestino, [monto, numero_cuenta_destino]);
+      // Validar saldo suficiente para transferencias y retiros
+      if ((tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'retiro') && saldoOrigen < monto) {
+        return res.status(400).json({ message: 'Saldo insuficiente' });
+      }
+
+      await connection.beginTransaction();
+
+      // Insertar la transacción
+      const result = await connection.query('INSERT INTO transacciones (numero_cuenta, tipo, monto) VALUES (?, ?, ?)', [
+        numero_cuenta_origen,
+        tipo,
+        monto,
+      ]);
+
+      // Actualizar el saldo de la cuenta de origen
+      let updateQueryOrigen;
+      if (tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'retiro') {
+        updateQueryOrigen = 'UPDATE usuarios SET saldo = saldo - ? WHERE numero_cuenta = ?';
+      } else if (tipo.toLowerCase() === 'deposito') {
+        updateQueryOrigen = 'UPDATE usuarios SET saldo = saldo - ? WHERE numero_cuenta = ?'; // Cambiado a resta
+      }
+
+      await connection.query(updateQueryOrigen, [monto, numero_cuenta_origen]);
+
+      // Si es una transferencia o depósito, actualizar el saldo de la cuenta de destino
+      if (tipo.toLowerCase() === 'transferencia' || tipo.toLowerCase() === 'deposito') {
+        const [cuentaDestino] = await connection.query(
+          'SELECT numero_cuenta, saldo FROM usuarios WHERE numero_cuenta = ?',
+          [numero_cuenta_destino]
+        );
+        if (!cuentaDestino.length) {
+          await connection.rollback();
+          return res.status(404).json({ message: 'Cuenta de destino no encontrada' });
+        }
+
+        const updateQueryDestino = 'UPDATE usuarios SET saldo = saldo + ? WHERE numero_cuenta = ?';
+        await connection.query(updateQueryDestino, [monto, numero_cuenta_destino]);
+      }
+
+      await connection.commit();
+
+      res.json({ message: 'Transacción creada exitosamente', transaccionId: result.insertId });
+    } else {
+      return res.status(404).json({ message: 'Cuenta de origen no encontrada' });
     }
-
-    await connection.commit();
-
-    res.json({ message: 'Transacción creada exitosamente', transaccionId: result.insertId });
   } catch (error) {
     console.error('Error al crear la transacción:', error);
     if (connection) await connection.rollback();
@@ -319,6 +333,7 @@ export const metodosTransaccion = {
   putPerfilUsuario,
   getPerfilUsuario,
   postTransaccion,
+  getCuentaOrigen,
   corsMiddleware,
   getPrincipal,
 };
